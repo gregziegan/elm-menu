@@ -1,0 +1,12 @@
+.mention {
+  cursor: pointer;
+  background: white;
+  text-decoration: none;
+  padding-top: 0.5px;
+  padding-bottom: 0.5px;
+}
+
+.mentionSelected {
+  color: #575f67;
+  background: #e6f3ff;
+}
