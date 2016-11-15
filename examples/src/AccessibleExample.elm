@@ -4,15 +4,13 @@ import Menu
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Html.App as Html
 import String
 import Json.Decode as Json
-import Json.Encode as JE
 import Dom
 import Task
 
 
-main : Program Never
+main : Program Never Model Msg
 main =
     Html.program
         { init = init ! []
@@ -150,8 +148,12 @@ update msg model =
                 newModel =
                     setQuery model id
                         |> resetMenu
+
+                focus =
+                    Dom.focus "president-input"
+                        |> Task.onError (\_ -> Task.succeed ())
             in
-                ( newModel, Task.perform (\err -> NoOp) (\_ -> NoOp) (Dom.focus "president-input") )
+                ( newModel, Task.perform (\_ -> NoOp) focus )
 
         PreviewPerson id ->
             { model | selectedPerson = Just <| getPersonAtId model.people id } ! []
@@ -200,16 +202,16 @@ view model =
             { preventDefault = True, stopPropagation = False }
 
         dec =
-            (Json.customDecoder keyCode
-                (\code ->
-                    if code == 38 || code == 40 then
-                        Ok NoOp
-                    else if code == 27 then
-                        Ok HandleEscape
-                    else
-                        Err "not handling that key"
-                )
-            )
+            Html.Events.keyCode
+                |> Json.andThen
+                    (\code ->
+                        if code == 38 || code == 40 then
+                            Json.succeed NoOp
+                        else if code == 27 then
+                            Json.succeed HandleEscape
+                        else
+                            Json.fail "not handling that key"
+                    )
 
         menu =
             if model.showMenu then
@@ -246,7 +248,6 @@ view model =
                         , value query
                         , id "president-input"
                         , class "menu-input"
-                        , menu False
                         , attribute "aria-owns" "list-of-presidents"
                         , attribute "aria-expanded" <| String.toLower <| toString model.showMenu
                         , attribute "aria-haspopup" <| String.toLower <| toString model.showMenu

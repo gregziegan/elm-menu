@@ -26,7 +26,7 @@ module Menu.Internal
 
 import Char exposing (KeyCode)
 import Html exposing (Html, Attribute)
-import Html.App
+import Html.Attributes
 import Html.Keyed
 import Html.Events
 import Keyboard
@@ -271,10 +271,10 @@ viewSection config state section =
             config.section.li section
 
         attributes =
-            List.map sectionNode.attributes
+            List.map mapNeverToMsg sectionNode.attributes
 
         customChildren =
-            List.map (Html.App.map (\html -> NoOp)) sectionNode.children
+            List.map (Html.map (\html -> NoOp)) sectionNode.children
 
         getKeyedItems datum =
             ( config.toId datum, viewData config state datum )
@@ -320,7 +320,7 @@ viewData { toId, li } { key, mouse } data =
                     False
     in
         Html.li customLiAttr
-            (List.map (Html.App.map (\html -> NoOp)) listItemData.children)
+            (List.map (Html.map (\html -> NoOp)) listItemData.children)
 
 
 viewList : ViewConfig data -> Int -> State -> List data -> Html Msg
@@ -366,7 +366,7 @@ viewItem { toId, li } { key, mouse } data =
                     False
     in
         Html.li customLiAttr
-            (List.map (Html.App.map (\html -> NoOp)) listItemData.children)
+            (List.map (Html.map (\html -> NoOp)) listItemData.children)
 
 
 type alias HtmlDetails msg =
@@ -450,4 +450,4 @@ sectionConfig { toId, getData, ul, li } =
 
 mapNeverToMsg : Attribute Never -> Attribute Msg
 mapNeverToMsg attribute =
-    Html.Attribute.map attribute
+    Html.Attributes.map (always NoOp) attribute
