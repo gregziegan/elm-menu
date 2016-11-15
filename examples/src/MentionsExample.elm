@@ -4,12 +4,11 @@ import Menu
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Html.App as Html
 import String
 import Json.Decode as Json
 
 
-main : Program Never
+main : Program Never Model Msg
 main =
     Html.program
         { init = init ! []
@@ -151,14 +150,14 @@ view model =
             { preventDefault = True, stopPropagation = False }
 
         dec =
-            (Json.customDecoder keyCode
-                (\code ->
-                    if code == 38 || code == 40 then
-                        Ok NoOp
-                    else
-                        Err "not handling that key"
-                )
-            )
+            Html.Events.keyCode
+                |> Json.andThen
+                    (\code ->
+                        if code == 38 || code == 40 then
+                            Json.succeed NoOp
+                        else
+                            Json.fail "not handling that key"
+                    )
 
         menu =
             if model.showMenu then
