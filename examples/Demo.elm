@@ -8,7 +8,7 @@ import Svg exposing (path)
 import Svg.Attributes exposing (d, fill, viewBox)
 
 
-main : Program Never
+main : Program Never Model Msg
 main =
     Html.program
         { init = init ! []
@@ -72,7 +72,7 @@ update msg model =
                                 _ ->
                                     model
                     in
-                        { model | accessibleMenu = fst <| AccessibleExample.update autoMsg model.accessibleMenu }
+                        { model | accessibleMenu = Tuple.first <| AccessibleExample.update autoMsg model.accessibleMenu }
                             |> toggleFocus autoMsg
 
                 SectionsExample autoMsg ->
@@ -85,7 +85,7 @@ update msg model =
                                 _ ->
                                     model
                     in
-                        { model | sectionsMenu = fst <| SectionsExample.update autoMsg model.sectionsMenu }
+                        { model | sectionsMenu = Tuple.first <| SectionsExample.update autoMsg model.sectionsMenu }
                             |> toggleFocus autoMsg
     in
         ( newModel, Cmd.none )
@@ -212,11 +212,11 @@ viewFooter =
 
 
 footerLink : String -> String -> Html Msg
-footerLink url text' =
+footerLink url title =
     a
         [ href url
         , class "footer-link"
         , target "_blank"
         , rel "noopenner noreferrer"
         ]
-        [ text text' ]
+        [ text title ]
